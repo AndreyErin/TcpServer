@@ -1,10 +1,9 @@
 ﻿using System.Net;
-using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
                                 //сервер
 //создаем сокет
-Socket mainSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+using Socket mainSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
 //создаем точку подключения которая будет адресом этого сервера
 // адрес будет любой из доступных на этой машине
@@ -16,7 +15,7 @@ try
     mainSocket.Bind(ep);
 
     //запускаем прослушивание. максимальное количество сообщений в очереди будет 1000
-    mainSocket.Listen(1000);
+    mainSocket.Listen();
 
     //в данном случае сокет будет прослушивать порть 8888 на любых локальных адресах
     Console.WriteLine("Сокет запущен. Ожидание подключения");
@@ -26,7 +25,7 @@ try
     while(true) 
     {
         //для подключенного клиента создается отдельный сокет
-        using Socket clientSocket = await mainSocket.AcceptAsync();
+        var clientSocket = await mainSocket.AcceptAsync();
         
         //запускаем общение с клиентом в отдельном потоке и ждем следующего клиента
         Task.Run(async ()=> await ProcessClientAsync(clientSocket));
