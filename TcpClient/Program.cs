@@ -10,3 +10,5 @@ catch (SocketException)
 {
     Console.WriteLine($"Не удалось установить подключение с {socket.RemoteEndPoint}");
 }
+
+Console.ReadLine();

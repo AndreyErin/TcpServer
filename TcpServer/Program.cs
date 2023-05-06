@@ -22,3 +22,5 @@ Console.WriteLine("Сокет запущен. Ожидание подключе�
 using Socket client = await socket.AcceptAsync();
 
 Console.WriteLine("Адрес клиента {0}", client.RemoteEndPoint);
+
+Console.ReadLine();
