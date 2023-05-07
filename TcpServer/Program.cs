@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
                                 //сервер
-                                //создаем сокет
+//создаем сокет
 using Socket mainSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
 //создаем точку подключения которая будет адресом этого сервера

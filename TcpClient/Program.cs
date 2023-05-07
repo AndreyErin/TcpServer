@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 
-/////клиент
+                                        /////клиент
 
 // слова для отправки для получения перевода
 var words = new string[] { "red", "yellow", "blue" };
