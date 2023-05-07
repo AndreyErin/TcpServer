@@ -1,9 +1,17 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
-                                    /////клиент
-                                    
+
+/////клиент
+
 // слова для отправки для получения перевода
 var words = new string[] { "red", "yellow", "blue" };
 
@@ -22,7 +30,7 @@ try
         byte[] data = Encoding.UTF8.GetBytes(word + '\n');
         // отправляем данные
         //ОТПРАВКА-----------------------------------------------
-        await socket.SendAsync(data);
+        await socket.SendAsync(data, SocketFlags.None);
 
         //Console.WriteLine((char)(data[1]));
 
@@ -32,7 +40,7 @@ try
         while (true)
         {
             //ПОЛУЧЕНИЕ----------------------------------------
-            var count = await socket.ReceiveAsync(bytesRead);
+            var count = await socket.ReceiveAsync(bytesRead, SocketFlags.None);
             // смотрим, если считанный байт представляет конечный символ, выходим
             if (count == 0 || bytesRead[0] == '\n') break;
             // иначе добавляем в буфер
@@ -42,11 +50,11 @@ try
         Console.WriteLine($"Слово {word}: {translation}");
         bufferForGet.Clear();
         // имитируем долговременную работу, чтобы одновременно несколько клиентов обрабатывались
-        await Task.Delay(2000);
+        //await Task.Delay(2000);
     }
     //ОТКЛЮЧАЕМСЯ ОТ СЕРВЕРА-------------------------
     // отправляем маркер завершения подключения - END
-    await socket.SendAsync(Encoding.UTF8.GetBytes("END\n"));
+    await socket.SendAsync(Encoding.UTF8.GetBytes("END\n"), SocketFlags.None);
 
 }
 catch (SocketException ex)

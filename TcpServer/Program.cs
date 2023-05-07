@@ -1,8 +1,16 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+
                                 //сервер
-//создаем сокет
+                                //создаем сокет
 using Socket mainSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
 //создаем точку подключения которая будет адресом этого сервера
@@ -58,39 +66,18 @@ async Task ProcessClientAsync(Socket client)
         // считываем данные до конечного символа
         while (true)
         {
-            Console.WriteLine("111111" + bufferForGet.ToString());
             //ПОЛУЧЕНИЕ-----------------------------------------
+            var count = await client.ReceiveAsync(bytesRead, SocketFlags.None);
+            // смотрим, если считанный байт представляет конечный символ, выходим
 
-            try
+            if (count == 0 || bytesRead[0] == '\n')
             {
-                var count = await client.ReceiveAsync(bytesRead);
-                // смотрим, если считанный байт представляет конечный символ, выходим
-                Console.WriteLine("222222" + bufferForGet.ToString());
-
-
-                if (count == 0 || bytesRead[0] == '\n')
-                {
-                    Console.WriteLine("33333" + bufferForGet.ToString());
-                    break;
-                }
+                break;
             }
-            catch (SocketException ex)
-            {
-                Console.WriteLine(ex.Message);
-
-            }
-
-
-            
-
-
-
-
-
 
             // иначе добавляем в буфер
-           // bufferForGet.Add(bytesRead[0]);
-            Console.WriteLine("44444" + bufferForGet.ToString());
+            bufferForGet.Add(bytesRead[0]);
+            
         }
         var word = Encoding.UTF8.GetString(bufferForGet.ToArray());
         // если прислан маркер окончания взаимодействия,
@@ -104,7 +91,7 @@ async Task ProcessClientAsync(Socket client)
         translation += '\n';
         // отправляем перевод слова из словаря
         //ОТПРАЛЯЕМ-------------------------------------------
-        await client.SendAsync(Encoding.UTF8.GetBytes(translation));
+        await client.SendAsync(Encoding.UTF8.GetBytes(translation), SocketFlags.None);
         bufferForGet.Clear();
     }
     client.Shutdown(SocketShutdown.Both);
