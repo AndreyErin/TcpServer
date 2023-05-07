@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcpServer", "TcpServer\TcpS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcpClient", "TcpClient\TcpClient.csproj", "{2A241613-DF53-4D3B-A4E6-1B539785FE9A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpServerWPF", "TcpServerWPF\TcpServerWPF.csproj", "{CA35C840-BFE1-46FD-9429-09D4F471CE0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcpServerWPF", "TcpServerWPF\TcpServerWPF.csproj", "{CA35C840-BFE1-46FD-9429-09D4F471CE0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpClientWPF", "TcpClientWPF\TcpClientWPF.csproj", "{75AD381A-6031-4CF2-B697-BBDE2B9A2F7E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpClientWPF", "TcpClientWPFF\TcpClientWPF.csproj", "{2F0A606A-4B44-4D71-A594-CD7DE4A78105}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{CA35C840-BFE1-46FD-9429-09D4F471CE0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA35C840-BFE1-46FD-9429-09D4F471CE0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA35C840-BFE1-46FD-9429-09D4F471CE0D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{75AD381A-6031-4CF2-B697-BBDE2B9A2F7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{75AD381A-6031-4CF2-B697-BBDE2B9A2F7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{75AD381A-6031-4CF2-B697-BBDE2B9A2F7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{75AD381A-6031-4CF2-B697-BBDE2B9A2F7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F0A606A-4B44-4D71-A594-CD7DE4A78105}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F0A606A-4B44-4D71-A594-CD7DE4A78105}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F0A606A-4B44-4D71-A594-CD7DE4A78105}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F0A606A-4B44-4D71-A594-CD7DE4A78105}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -28,6 +28,7 @@ namespace TcpServerWPF
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            
             //сервер
             //создаем сокет
             using Socket mainSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -63,6 +64,13 @@ namespace TcpServerWPF
                 MessageBox.Show(ex.Message);
             }
         }
+
+
+
+
+
+
+
         //общение с конкрентым клиентом
         async Task ProcessClientAsync(Socket client, Dispatcher MainDisp)
         {
