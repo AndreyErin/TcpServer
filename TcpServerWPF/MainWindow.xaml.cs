@@ -15,12 +15,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-
+                                           //сервер
 namespace TcpServerWPF
 {
 
     public partial class MainWindow : Window
     {
+        Canvas cnvItem = new Canvas() { Width = 40, Height = 40, Background = Brushes.Brown };
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -28,8 +31,11 @@ namespace TcpServerWPF
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            
-            //сервер
+            //Canvas cnvItem = new Canvas() { Width = 40, Height = 40, Background = Brushes.Brown};
+            Canvas.SetTop(cnvItem, 10);
+            Canvas.SetLeft(cnvItem, 10);
+            cnvMainServer.Children.Add(cnvItem);
+
             //создаем сокет
             using Socket mainSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
@@ -75,13 +81,6 @@ namespace TcpServerWPF
         async Task ProcessClientAsync(Socket client, Dispatcher MainDisp)
         {
 
-            // условный словарь
-            var words = new Dictionary<string, string>()
-    {
-        { "red", "красный" },
-        { "blue", "синий" },
-        { "green", "зеленый" },
-    };
             // буфер для накопления входящих данных
             var bufferForGet = new List<byte>();
 
@@ -94,39 +93,42 @@ namespace TcpServerWPF
                 {
                     //ПОЛУЧЕНИЕ-----------------------------------------
                     var count = await client.ReceiveAsync(bytesRead, SocketFlags.None);
-                    // смотрим, если считанный байт представляет конечный символ, выходим
 
+                    // смотрим, если считанный байт представляет конечный символ, выходим
                     if (count == 0 || bytesRead[0] == '\n')
                     {
                         break;
                     }
-
                     // иначе добавляем в буфер
                     bufferForGet.Add(bytesRead[0]);
-
                 }
                 var word = Encoding.UTF8.GetString(bufferForGet.ToArray());
                 // если прислан маркер окончания взаимодействия,
                 // выходим из цикла и завершаем взаимодействие с клиентом
                 if (word == "END") break;
 
+                string[] strPos = word.Split(';');
+
+                //MessageBox.Show(strPos.Length.ToString());
+                
+                
                 Action action = () =>
                 {
-                    txtStatConnectServer.Text += $"Запрошен перевод слова {word}\n";
+                    Canvas.SetTop(cnvItem, double.Parse(strPos[1]));
+                    Canvas.SetLeft(cnvItem, double.Parse(strPos[0]));
+                    txtStatConnectServer.Text = $"Координаты \n X: {strPos[0]}\n Y: {strPos[1]}";
+
                 };
                 MainDisp.Invoke(action);
 
-                // находим слово в словаре и отправляем обратно клиенту
-                if (!words.TryGetValue(word, out var translation)) translation = "не найдено в словаре";
-                // добавляем символ окончания сообщения 
-                translation += '\n';
-                // отправляем перевод слова из словаря
-                //ОТПРАЛЯЕМ-------------------------------------------
-                await client.SendAsync(Encoding.UTF8.GetBytes(translation), SocketFlags.None);
-                bufferForGet.Clear();
+                //strPos = null;
+
+//               //ОТПРАЛЯЕМ-------------------------------------------
+//               await client.SendAsync(Encoding.UTF8.GetBytes(translation), SocketFlags.None);
+               bufferForGet.Clear();
             }
-            client.Shutdown(SocketShutdown.Both);
-            client.Close();
+            //client.Shutdown(SocketShutdown.Both);
+            //client.Close();
         }
     }
 }

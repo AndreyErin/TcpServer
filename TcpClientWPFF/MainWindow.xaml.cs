@@ -54,24 +54,6 @@ namespace TcpClientWPF
                 
         }
 
-        private void Window_MouseMove(object sender, MouseEventArgs e)
-        {
-            Point point = e.GetPosition(cnvMainClient);
-            if (point.Y >= 0)
-                Canvas.SetTop(cnvItem, point.Y - 20);
-            if (point.X >= 0)
-                Canvas.SetLeft(cnvItem, point.X - 20);
-
-            StringBuilder sb = new StringBuilder();
-            sb.Append(point);
-            lblPos.Content = sb.ToString();
-
-            if (connect) 
-            {
-                SetDataOfServer(point);
-            }
-        }
-
         //получение данных
         private async void GetDataOfServer()
         {
@@ -119,7 +101,7 @@ namespace TcpClientWPF
             try
             {
                 //ПОДКЛЮЧЕНИЕ-------------------------------------
-                await socketGlobal.ConnectAsync("127.0.0.1", 8888);
+                await socketGlobal.ConnectAsync("192.168.0.34", 8888);
                 txtStatConnectClient.Text += $"Подключено";
                 connect = true;
             }
@@ -145,6 +127,24 @@ namespace TcpClientWPF
                 txtStatConnectClient.Text += (ex.Message + "\n");
             }
 
+        }
+
+        private void cnvMainClient_MouseMove(object sender, MouseEventArgs e)
+        {
+            Point point = e.GetPosition(cnvMainClient);
+            if (point.Y >= 0)
+                Canvas.SetTop(cnvItem, point.Y - 20);
+            if (point.X >= 0)
+                Canvas.SetLeft(cnvItem, point.X - 20);
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append(point);
+            lblPos.Content = sb.ToString();
+
+            if (connect)
+            {
+                SetDataOfServer(point);
+            }
         }
     }
 }

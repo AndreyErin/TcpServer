@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TcpClientWPFF"
         mc:Ignorable="d"
-        Title="Client" Height="450" Width="800" Loaded="Window_Loaded" MouseMove="Window_MouseMove">
+        Title="Client" Height="450" Width="800" Loaded="Window_Loaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -24,6 +24,6 @@
             <Label Grid.Column="3" Content="0.0" x:Name="lblPos" Width="200"/>
         </Grid>
         
-        <Canvas Grid.Row="1" x:Name="cnvMainClient" Background="SeaGreen"/>
+        <Canvas Grid.Row="1" x:Name="cnvMainClient" Background="SeaGreen" MouseMove="cnvMainClient_MouseMove"/>
     </Grid>
 </Window>
