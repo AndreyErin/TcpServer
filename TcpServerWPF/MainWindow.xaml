@@ -13,7 +13,7 @@
         </Grid.RowDefinitions>
 
         <TextBox Grid.Row="0" x:Name="txtStatConnectServer" Height="100" VerticalScrollBarVisibility="Auto" />
-        <Canvas Grid.Row="1" x:Name="cnvMainServer" Background="Beige"/>
+        <Canvas Grid.Row="1" x:Name="cnvMainServer" Background="Beige" MouseMove="cnvMainServer_MouseMove"/>
 
     </Grid>
 </Window>

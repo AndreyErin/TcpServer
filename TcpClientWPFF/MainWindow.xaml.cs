@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 using System.Windows;
@@ -14,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace TcpClientWPF
 {
@@ -23,8 +26,11 @@ namespace TcpClientWPF
     /// </summary>
     public partial class MainWindow : Window
     {
+        Dispatcher MainDisp = Dispatcher.CurrentDispatcher;
         Canvas cnvItem = new Canvas() { Width = 40, Height = 40, Background = Brushes.Black };
+        Canvas cnvItemOfServer = new Canvas() { Width = 40, Height = 40, Background = Brushes.Red };
         bool connect = false;
+        System.Windows.Point pointMouse = new System.Windows.Point();
 
         public MainWindow()
         {
@@ -44,38 +50,70 @@ namespace TcpClientWPF
         {
             //ФПС
             System.Windows.Media.CompositionTarget.Rendering += RenderingFPS;
-
+            //управляется мышкой
             Canvas.SetTop(cnvItem, 10);
             Canvas.SetLeft(cnvItem, 10);
             cnvMainClient.Children.Add(cnvItem);
+            //управляется сервером
+            Canvas.SetTop(cnvItem, 10);
+            Canvas.SetLeft(cnvItem, 100);
+            cnvMainClient.Children.Add(cnvItemOfServer);
+
             //using
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             socketGlobal = socket; 
                 
         }
-
+        //---------------------------------------------------
         //получение данных
         private async void GetDataOfServer()
         {
-//            List<byte> bufferForGet = new List<byte>();
-//            // буфер для считывания одного байта
-//            var bytesRead = new byte[1];
-//            // считываем данные до конечного символа
-//            while (true)
-//            {
-//                //ПОЛУЧЕНИЕ----------------------------------------
-//                var count = await socketGlobal.ReceiveAsync(bytesRead, SocketFlags.None);
-//                // txtStatConnectClient.Text += "ПОЛУЧЕНИЕ ДАННЫХ\n";
-//
-//                // смотрим, если считанный байт представляет конечный символ, выходим
-//                if (count == 0 || bytesRead[0] == '\n') break;
-//                // иначе добавляем в буфер
-//                bufferForGet.Add(bytesRead[0]);
-//            }
-        }
+            // буфер для накопления входящих данных
+            var bufferForGet = new List<byte>();
 
+            // буфер для считывания одного байта
+            var bytesRead = new byte[1];
+            
+            while (true)
+            {
+
+                // считываем данные до конечного символа
+                while (true)
+                {
+                    //ПОЛУЧЕНИЕ-----------------------------------------
+                    var count = await socketGlobal.ReceiveAsync(bytesRead, SocketFlags.None);
+
+                    // смотрим, если считанный байт представляет конечный символ, выходим
+                    if (count == 0 || bytesRead[0] == '\n')
+                    {
+                        break;
+                    }
+                    // иначе добавляем в буфер
+                    bufferForGet.Add(bytesRead[0]);
+                }
+                var word = Encoding.UTF8.GetString(bufferForGet.ToArray());
+                // если прислан маркер окончания взаимодействия,
+                // выходим из цикла и завершаем взаимодействие с клиентом
+                if (word == "END") break;
+
+                string[] strPos = word.Split(';');
+
+                
+                Action action = () =>
+                {
+                    Canvas.SetTop(cnvItemOfServer, double.Parse(strPos[1]) - 20);
+                    Canvas.SetLeft(cnvItemOfServer, double.Parse(strPos[0]) -20);
+                    //txtStatConnectServer.Text = $"Координаты \n X: {strPos[0]}\n Y: {strPos[1]}";
+                };
+                MainDisp.Invoke(action);
+
+                bufferForGet.Clear();
+                //Thread.Sleep(10);
+            }
+        }
+        
         //отправка данных
-        private async void SetDataOfServer(Point point)
+        private async void SetDataOfServer(System.Windows.Point point)
         {
             try
             {
@@ -94,7 +132,7 @@ namespace TcpClientWPF
                 txtStatConnectClient.Text += (ex.Message + "\n");
             }
         }
-
+        
         //коннект
         private async void btnConnect_Click(object sender, RoutedEventArgs e)
         {
@@ -110,6 +148,8 @@ namespace TcpClientWPF
                 txtStatConnectClient.Text += (ex.Message + "\n");
             }
 
+            //GetDataOfServer();
+            Task.Factory.StartNew(() => { GetDataOfServer(); });
         }
 
         //дисконнект
@@ -126,24 +166,26 @@ namespace TcpClientWPF
             {
                 txtStatConnectClient.Text += (ex.Message + "\n");
             }
-
+            //socketGlobal.Shutdown(SocketShutdown.Both);
+            //socketGlobal.Close();
         }
 
+        //передвижение мыши
         private void cnvMainClient_MouseMove(object sender, MouseEventArgs e)
         {
-            Point point = e.GetPosition(cnvMainClient);
-            if (point.Y >= 0)
-                Canvas.SetTop(cnvItem, point.Y - 20);
-            if (point.X >= 0)
-                Canvas.SetLeft(cnvItem, point.X - 20);
+            pointMouse = e.GetPosition(cnvMainClient);
+            if (pointMouse.Y >= 0)
+                Canvas.SetTop(cnvItem, pointMouse.Y - 20);
+            if (pointMouse.X >= 0)
+                Canvas.SetLeft(cnvItem, pointMouse.X - 20);
 
             StringBuilder sb = new StringBuilder();
-            sb.Append(point);
+            sb.Append(pointMouse);
             lblPos.Content = sb.ToString();
 
             if (connect)
             {
-                SetDataOfServer(point);
+                SetDataOfServer(pointMouse);
             }
         }
     }
