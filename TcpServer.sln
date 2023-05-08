@@ -3,13 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33627.172
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcpServer", "TcpServer\TcpServer.csproj", "{44F1B1B9-1862-4BF7-A8BB-70BCA59DF6D5}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcpClient", "TcpClient\TcpClient.csproj", "{2A241613-DF53-4D3B-A4E6-1B539785FE9A}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcpServerWPF", "TcpServerWPF\TcpServerWPF.csproj", "{CA35C840-BFE1-46FD-9429-09D4F471CE0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpClientWPF", "TcpClientWPFF\TcpClientWPF.csproj", "{2F0A606A-4B44-4D71-A594-CD7DE4A78105}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcpClientWPF", "TcpClientWPFF\TcpClientWPF.csproj", "{2F0A606A-4B44-4D71-A594-CD7DE4A78105}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,14 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{44F1B1B9-1862-4BF7-A8BB-70BCA59DF6D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{44F1B1B9-1862-4BF7-A8BB-70BCA59DF6D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{44F1B1B9-1862-4BF7-A8BB-70BCA59DF6D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{44F1B1B9-1862-4BF7-A8BB-70BCA59DF6D5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2A241613-DF53-4D3B-A4E6-1B539785FE9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2A241613-DF53-4D3B-A4E6-1B539785FE9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2A241613-DF53-4D3B-A4E6-1B539785FE9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2A241613-DF53-4D3B-A4E6-1B539785FE9A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CA35C840-BFE1-46FD-9429-09D4F471CE0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CA35C840-BFE1-46FD-9429-09D4F471CE0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA35C840-BFE1-46FD-9429-09D4F471CE0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
