@@ -29,7 +29,7 @@ namespace TcpClientWPF
         Dispatcher MainDisp = Dispatcher.CurrentDispatcher;
         Canvas cnvItem = new Canvas() { Width = 40, Height = 40, Background = Brushes.Black };
         Canvas cnvItemOfServer = new Canvas() { Width = 40, Height = 40, Background = Brushes.Red };
-        bool connect = false;
+        //bool connect = false;
         System.Windows.Point pointMouse = new System.Windows.Point();
 
         public MainWindow()
@@ -59,14 +59,12 @@ namespace TcpClientWPF
             Canvas.SetLeft(cnvItem, 100);
             cnvMainClient.Children.Add(cnvItemOfServer);
 
-            //using
-            var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            socketGlobal = socket; 
-                
+
+
         }
         //---------------------------------------------------
         //получение данных
-        private async void GetDataOfServer()
+        private async Task GetDataOfServer()
         {
             // буфер для накопления входящих данных
             var bufferForGet = new List<byte>();
@@ -74,11 +72,11 @@ namespace TcpClientWPF
             // буфер для считывания одного байта
             var bytesRead = new byte[1];
             
-            while (true)
+            while (socketGlobal.Connected)
             {
 
                 // считываем данные до конечного символа
-                while (true)
+                while (socketGlobal.Connected)
                 {
                     //ПОЛУЧЕНИЕ-----------------------------------------
                     var count = await socketGlobal.ReceiveAsync(bytesRead, SocketFlags.None);
@@ -90,84 +88,114 @@ namespace TcpClientWPF
                     }
                     // иначе добавляем в буфер
                     bufferForGet.Add(bytesRead[0]);
+
+                    //if(!socketGlobal.Connected)
                 }
                 var word = Encoding.UTF8.GetString(bufferForGet.ToArray());
-                // если прислан маркер окончания взаимодействия,
-                // выходим из цикла и завершаем взаимодействие с клиентом
-                if (word == "END") break;
 
                 string[] strPos = word.Split(';');
 
-                
-                Action action = () =>
+                if (strPos.Length > 1)
                 {
-                    Canvas.SetTop(cnvItemOfServer, double.Parse(strPos[1]) - 20);
-                    Canvas.SetLeft(cnvItemOfServer, double.Parse(strPos[0]) -20);
-                    //txtStatConnectServer.Text = $"Координаты \n X: {strPos[0]}\n Y: {strPos[1]}";
-                };
-                MainDisp.Invoke(action);
+                    Action action = () =>
+                    {
 
+                        Canvas.SetTop(cnvItemOfServer, double.Parse(strPos[1]) - 20);
+                        Canvas.SetLeft(cnvItemOfServer, double.Parse(strPos[0]) - 20);
+                        //txtStatConnectServer.Text = $"Координаты \n X: {strPos[0]}\n Y: {strPos[1]}";
+
+                    };
+                    MainDisp.Invoke(action);
+                }
                 bufferForGet.Clear();
-                //Thread.Sleep(10);
+                Thread.Sleep(10);
             }
         }
         
         //отправка данных
-        private async void SetDataOfServer(System.Windows.Point point)
+        private async void SetDataOfServer(/*System.Windows.Point point*/)
         {
-            try
+            while (socketGlobal.Connected)
             {
-                StringBuilder sb = new StringBuilder();
-                sb.Append(point);
-                //MessageBox.Show(sb.ToString());
-                // считыванием строку в массив байт
-                // при отправке добавляем маркер завершения сообщения - \n
-                byte[] data = Encoding.UTF8.GetBytes(sb.ToString() + '\n');
+                try
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(pointMouse);
+                    // считыванием строку в массив байт
+                    // при отправке добавляем маркер завершения сообщения - \n
+                    byte[] data = Encoding.UTF8.GetBytes(sb.ToString() + '\n');
 
-                // отправляем данные               
-                await socketGlobal.SendAsync(data, SocketFlags.None);
+                    // отправляем данные               
+                    await socketGlobal.SendAsync(data, SocketFlags.None);
+                }
+                catch (SocketException ex)
+                {
+                    txtStatConnectClient.Text += (ex.Message + "\n");
+                }
+                Thread.Sleep(10);
             }
-            catch (SocketException ex)
-            {
-                txtStatConnectClient.Text += (ex.Message + "\n");
-            }
+
         }
         
         //коннект
         private async void btnConnect_Click(object sender, RoutedEventArgs e)
         {
-            try
+            if ( socketGlobal == null || !socketGlobal.Connected)
             {
-                //ПОДКЛЮЧЕНИЕ-------------------------------------
-                await socketGlobal.ConnectAsync("192.168.0.34", 8888);
-                txtStatConnectClient.Text += $"Подключено";
-                connect = true;
+                //using
+                var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                socketGlobal = socket;
+
+                try
+                {
+                    //ПОДКЛЮЧЕНИЕ-------------------------------------
+                    await socketGlobal.ConnectAsync("192.168.0.34", 8888);
+                    txtStatConnectClient.Text += $"Подключено\n";
+                    //connect = true;
+                }
+                catch (SocketException ex)
+                {
+                    txtStatConnectClient.Text += (ex.Message + "\n");
+                }
+
+                Task.Factory.StartNew(() => { GetDataOfServer();  SetDataOfServer(); });
             }
-            catch (SocketException ex)
+            else 
             {
-                txtStatConnectClient.Text += (ex.Message + "\n");
+                MessageBox.Show("Уже подключено");
             }
 
-            //GetDataOfServer();
-            Task.Factory.StartNew(() => { GetDataOfServer(); });
         }
 
         //дисконнект
         private async void btnDisConnect_Click(object sender, RoutedEventArgs e)
         {
-            try
+            if (socketGlobal.Connected)
             {
-                //ОТКЛЮЧАЕМСЯ ОТ СЕРВЕРА-------------------------
-                // отправляем маркер завершения подключения - END
-                await socketGlobal.SendAsync(Encoding.UTF8.GetBytes("END\n"), SocketFlags.None);
-                connect = false;
+                try
+                {
+                    //ОТКЛЮЧАЕМСЯ ОТ СЕРВЕРА-------------------------
+                    // отправляем маркер завершения подключения - END
+                    await socketGlobal.SendAsync(Encoding.UTF8.GetBytes("END\n"), SocketFlags.None);
+                    //connect = false;
+                    
+                }
+                catch (SocketException ex)
+                {
+                    txtStatConnectClient.Text += (ex.Message + "\n");
+                }
+                
+                 socketGlobal.Shutdown(SocketShutdown.Both);
+                 Thread.Sleep(50);
+                 //socketGlobal.Disconnect(true);
+                 txtStatConnectClient.Text += $"Отключено\n";
+                 socketGlobal.Close();
             }
-            catch (SocketException ex)
+            else 
             {
-                txtStatConnectClient.Text += (ex.Message + "\n");
+                MessageBox.Show("И так нет подключения. Че тебе надо вапще?");
             }
-            //socketGlobal.Shutdown(SocketShutdown.Both);
-            //socketGlobal.Close();
+
         }
 
         //передвижение мыши
@@ -183,10 +211,10 @@ namespace TcpClientWPF
             sb.Append(pointMouse);
             lblPos.Content = sb.ToString();
 
-            if (connect)
-            {
-                SetDataOfServer(pointMouse);
-            }
+//            if (socketGlobal.Connected)
+//            {
+//                SetDataOfServer(pointMouse);
+//            }
         }
     }
 }

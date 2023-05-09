@@ -25,6 +25,7 @@ namespace TcpServerWPF
         Canvas cnvItem = new Canvas() { Width = 40, Height = 40, Background = Brushes.Black };
         Canvas cnvItemOfClient = new Canvas() { Width = 40, Height = 40, Background = Brushes.Red };
         Point pointMauseCurrent = new Point();
+        List<Socket> allClients = new List<Socket>();
 
         public MainWindow()
         {
@@ -58,7 +59,7 @@ namespace TcpServerWPF
                 mainSocket.Listen();
 
                 //в данном случае сокет будет прослушивать порть 8888 на любых локальных адресах
-                txtStatConnectServer.Text += "Сокет запущен. Ожидание подключения\n";
+                txtConnectDisconect.Text += "Сокет запущен. Ожидание подключения\n";
 
 
                 //слушаем новые подключения
@@ -66,10 +67,14 @@ namespace TcpServerWPF
                 {
                     //для подключенного клиента создается отдельный сокет
                     var clientSocket = await mainSocket.AcceptAsync();
+                    txtConnectDisconect.Text += "Подключен" + clientSocket.RemoteEndPoint?.ToString() + "_\n";
 
+                    allClients.Add(clientSocket);
                     //запускаем общение с клиентом в отдельном потоке и ждем следующего клиента
-                    Task.Run( async () => await ProcessClientAsync(clientSocket, Dispatcher));
-                    Task.Run(async () => await SetDataToClient(clientSocket));
+                    Task.Run( () => { GetDataAsync(clientSocket, Dispatcher); SetDataToClient(clientSocket); });
+                    //Task.Run(async () => await SetDataToClient(clientSocket));
+
+                    txtCoutntClient.Text = allClients.Count.ToString();
                 }
             }
             catch (SocketException ex)
@@ -80,7 +85,7 @@ namespace TcpServerWPF
 
 
         // Прием. общение с конкрентым клиентом
-        async Task ProcessClientAsync(Socket client, Dispatcher MainDisp)
+        async Task GetDataAsync(Socket client, Dispatcher MainDisp)
         {
 
             // буфер для накопления входящих данных
@@ -107,7 +112,13 @@ namespace TcpServerWPF
                 var word = Encoding.UTF8.GetString(bufferForGet.ToArray());
                 // если прислан маркер окончания взаимодействия,
                 // выходим из цикла и завершаем взаимодействие с клиентом
-                if (word == "END") break;
+                if (word == "END") 
+                {
+                    //MessageBox.Show("");
+                    break;
+                    
+                }
+                    
 
                 string[] strPos = word.Split(';');
 
@@ -116,23 +127,31 @@ namespace TcpServerWPF
                 {
                     Canvas.SetTop(cnvItem, double.Parse(strPos[1]) - 20);
                     Canvas.SetLeft(cnvItem, double.Parse(strPos[0]) - 20);
-                    txtStatConnectServer.Text = $"Координаты \n X: {strPos[0]}\n Y: {strPos[1]}";
-
+                    txtStatConnectServer.Text = $"Координаты \n X: {strPos[0]}\n Y: {strPos[1]}\n";
                 };
                 MainDisp.Invoke(action);
                bufferForGet.Clear();
 
-
-
             }
-            //client.Shutdown(SocketShutdown.Both);
-            //client.Close();
+            allClients.Remove(client);
+            client.Shutdown(SocketShutdown.Both);
+            Thread.Sleep(50);
+            //MessageBox.Show(client.RemoteEndPoint?.ToString());
+            
+            client.Close();
+
+            Action action1 = () =>
+            {
+                txtConnectDisconect.Text += $"Отключен {client.RemoteEndPoint?.ToString()}\n";
+                txtCoutntClient.Text = allClients.Count.ToString();
+            };
+            MainDisp.Invoke(action1);
         }
 
         //отправка
         async Task SetDataToClient(Socket client)         
         {
-            while (true)
+            while (client.Connected)
             {
                 //ОТПРАВКА
                 try
@@ -154,7 +173,7 @@ namespace TcpServerWPF
                 {
                     txtStatConnectServer.Text += (ex.Message + "\n");
                 }
-                Thread.Sleep(1);
+                Thread.Sleep(10);
             }
         }
 

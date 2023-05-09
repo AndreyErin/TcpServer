@@ -11,8 +11,20 @@
             <RowDefinition Height="auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
+        <Grid  Grid.Row="0" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0"  x:Name="txtStatConnectServer" Height="100" VerticalScrollBarVisibility="Auto" />
+            <TextBox Grid.Column="1"  x:Name="txtCoutntClient" Height="100" VerticalScrollBarVisibility="Auto" />
+            <TextBox Grid.Column="2"  x:Name="txtConnectDisconect" Height="100" VerticalScrollBarVisibility="Auto" />
 
-        <TextBox Grid.Row="0" x:Name="txtStatConnectServer" Height="100" VerticalScrollBarVisibility="Auto" />
+
+        </Grid>
+
+       
         <Canvas Grid.Row="1" x:Name="cnvMainServer" Background="Beige" MouseMove="cnvMainServer_MouseMove"/>
 
     </Grid>
